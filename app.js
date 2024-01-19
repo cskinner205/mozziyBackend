@@ -550,7 +550,7 @@ app.post('/loginWithGoogle', async (req, res) => {
           msg: "Authorized User! Redirect to login page",
           signedByGoogle: true,
           statusCode: 200,
-          profile_Image: user?.profile_Image ? user?.profile_Image : "",
+          profile_Image: user?.profile_Image ? user?.profile_Image : null,
           userName: user.name,
           isNotifyUserEnabled: user?.isNotifyUserEnabled ? user?.isNotifyUserEnabled : null
         })
@@ -723,28 +723,27 @@ app.post("/api/loginWithApple", async (req, res) =>{
 
     let { email, name, id } = req.body;
 
-    const user = await collection.findOne({ email: email });
-    console.log("user", user)
-    console.log("4444")
+    const user = await collection.findOne({ appleId: id });
+
     if (user) {
-      if (user.signedByGoogle) {
+      if (user.signedByApple) {
   
         res.status(200).send({
           id: user._id,
           msg: "Authorized User! Redirect to login page",
-          signedByGoogle: true,
+          signedByApple: true,
           statusCode: 200,
-          profile_Image: user?.profile_Image ? user?.profile_Image : "",
+          profile_Image: user?.profile_Image ? user?.profile_Image : null,
           userName: user.name,
           isNotifyUserEnabled: user?.isNotifyUserEnabled ? user?.isNotifyUserEnabled : null
         })
       }
-      else if (user.appleId === false) {
+      else if (user.signedByApple === false) {
 
         res.status(409).send({ 
           msg: "Email already exists!. Please sign in by email and password", 
-        signedByGoogle: false, 
-        statusCode: 409 })
+          signedByApple: false, 
+          statusCode: 409 })
       }
     } else {
       data = {
@@ -761,7 +760,7 @@ app.post("/api/loginWithApple", async (req, res) =>{
         res.status(200).send({ 
           message: "User Created Successfully", 
           id: result.insertedId, 
-          signedByGoogle: true, 
+          signedByApple: true, 
           status: 200 
         })
       }
